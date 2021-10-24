@@ -33,11 +33,11 @@ public class StubbornLinks extends Channel {
 
     @Override
     public boolean deliver(String rawMessage) throws IOException {
-        String message = Utils.getMessage(rawMessage);
         String uuid = Utils.getUUID(rawMessage);
-        int processId = Integer.parseInt(Utils.getProcessId(uuid));
+        String message = Utils.getMessage(rawMessage);
 
         if (!message.equals(Constants.CONFIRMATION)){
+            int processId = Integer.parseInt(Utils.getProcessId(uuid));
             Host host = _parser.getHostById(processId);
             String confirmMessage = Utils.addHeader(uuid, Constants.CONFIRMATION);
             Utils.sendUdpMessage(confirmMessage, InetAddress.getByName(host.getIp()), host.getPort());

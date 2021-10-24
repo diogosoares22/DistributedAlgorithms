@@ -6,6 +6,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
 
 /** code based on https://www.baeldung.com/udp-in-java **/
 
@@ -15,11 +16,13 @@ public class MessageReceiver extends Thread {
     private final FairLossLinks _fairLossLink;
     private boolean _running = true;
     private final byte[] buf = new byte[256];
+    private final ExecutorService _executorService;
 
 
-    public MessageReceiver(int hostPort, FairLossLinks fairLossLink) throws SocketException {
+    public MessageReceiver(int hostPort, FairLossLinks fairLossLink, ExecutorService executor) throws SocketException {
         _socket = new DatagramSocket(hostPort);
         _fairLossLink = fairLossLink;
+        _executorService = executor;
     }
 
     @Override
@@ -39,11 +42,18 @@ public class MessageReceiver extends Thread {
             String received
                     = new String(packet.getData(), 0, packet.getLength());
 
-            try {
-                _fairLossLink.deliver(received);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            Thread t1 = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try{
+                        _fairLossLink.deliver(received);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            _executorService.execute(t1);
+
         }
         _socket.close();
     }

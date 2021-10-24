@@ -8,6 +8,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.sql.Timestamp;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -27,7 +28,12 @@ public class Main {
         try {
             File file = new File(output);
             FileWriter fileWriter = new FileWriter(file);
-            fileWriter.write(logs.substring(0,logs.length() - 1));
+            if (logs.length() > 0){
+                fileWriter.write(logs.substring(0,logs.length() - 1));
+            }
+            else {
+                fileWriter.write("");
+            }
             fileWriter.flush();
             fileWriter.close();
 
@@ -92,9 +98,9 @@ public class Main {
 
         perfectLink.setBelowChannel(stubbornLink);
 
-        MessageReceiver receiver = new MessageReceiver(parser.myPort(), fairLossLink);
+        ExecutorService executor_receiver = Executors.newFixedThreadPool(15);
 
-        receiver.start();
+        MessageReceiver receiver = new MessageReceiver(parser.myPort(), fairLossLink, executor_receiver);
 
         int noMessages = parser.getMessageNumber();
 
@@ -102,13 +108,18 @@ public class Main {
 
         Host destination = parser.getHostById(destinationId);
 
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+
+        System.out.println("Current timestamp -> " + timestamp.toString() + "\n");
+
         System.out.println("Broadcasting and delivering messages...\n");
 
+        receiver.start();
+
         if (parser.myId() != destinationId) {
-            ExecutorService executor = Executors.newFixedThreadPool(5);
-            for (int i = 0; i < noMessages; i++) {
-                Thread.sleep(1); // this makes sure the timestamp can't be equal
-                String uuid = Utils.createUUID(Integer.toString(parser.myId()));
+            ExecutorService executor = Executors.newFixedThreadPool(15);
+            for (int i = 1; i < noMessages + 1; i++) {
+                String uuid = Utils.createUUID(Integer.toString(parser.myId()), String.valueOf(i));
                 MessageSender obj = new MessageSender(perfectLink, uuid, String.valueOf(i) , InetAddress.getByName(destination.getIp()), destination.getPort());
                 executor.execute(obj);
             }

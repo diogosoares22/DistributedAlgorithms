@@ -7,6 +7,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.sql.Timestamp;
+import java.util.Date;
 
 public class Utils {
 
@@ -19,14 +20,18 @@ public class Utils {
         return arr[0];
     }
 
-    public static String createUUID(String processId){
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        return processId + "@" + timestamp.toString();
+    public static String createUUID(String processId, String sequenceId){
+        return processId + "@" + sequenceId;
     }
 
     public static String getProcessId(String UUID){
         String[] arr = UUID.split("@", 2);
         return arr[0];
+    }
+
+    public static String getSequenceId(String UUID){
+        String[] arr = UUID.split("@", 2);
+        return arr[1];
     }
 
     public static String getMessage(String rawMessage){
@@ -44,25 +49,5 @@ public class Utils {
         socket.send(packet);
 
         socket.close();
-    }
-
-    public static String receiveUdpMessage(int port, DatagramSocket socket) throws SocketException {
-        byte[] buf = new byte[256];
-
-
-        if (socket == null){
-            socket = new DatagramSocket(port);
-        }
-        DatagramPacket packet
-                = new DatagramPacket(buf, buf.length);
-        try {
-            socket.receive(packet);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        socket.close();
-
-        return new String(packet.getData(), 0, packet.getLength());
     }
 }

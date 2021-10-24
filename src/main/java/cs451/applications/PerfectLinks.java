@@ -4,6 +4,7 @@ import cs451.Parser;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.sql.Timestamp;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -27,10 +28,8 @@ public class PerfectLinks extends Channel {
     @Override
     public boolean deliver(String rawMessage) throws IOException {
         String uuid = Utils.getUUID(rawMessage);
-        if (!_messageDB.containsKey(uuid)){
-            System.out.println("Received message  ---- " + rawMessage + " ---- ...\n");
-            _messageDB.put(uuid, rawMessage);
-            _logs.add("d " + Utils.getProcessId(uuid) + " " + Utils.getMessage(rawMessage));
+        if (_messageDB.putIfAbsent(uuid, rawMessage) == null){
+            _logs.add("d " + Utils.getProcessId(uuid) + " " + Utils.getSequenceId(uuid));
             return true;
         }
         return false;

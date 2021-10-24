@@ -2,6 +2,7 @@ package cs451.applications;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.sql.Timestamp;
 
 public class MessageSender extends Thread {
 
@@ -26,6 +27,5 @@ public class MessageSender extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("Finished sending -------  " + _uuid + "-----------");
     }
 }
