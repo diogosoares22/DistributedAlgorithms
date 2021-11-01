@@ -86,7 +86,7 @@ public class Main {
 
         FairLossLinks fairLossLink = new FairLossLinks(ImportantData._logs);
 
-        StubbornLinks stubbornLink = new StubbornLinks(ImportantData._logs, parser, ImportantData._ackDB);
+        StubbornLinks stubbornLink = new StubbornLinks(ImportantData._logs, parser);
 
         PerfectLinks perfectLink = new PerfectLinks(ImportantData._logs, ImportantData._messageDB);
 

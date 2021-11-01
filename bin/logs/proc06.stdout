@@ -1,0 +1,89 @@
+My PID: 1739620
+
+From a new terminal type `kill -SIGINT 1739620` or `kill -SIGTERM 1739620` to stop processing packets
+
+My ID: 6
+
+List of resolved hosts is:
+==========================
+1
+Human-readable IP: 127.0.0.1
+Human-readable Port: 11001
+
+2
+Human-readable IP: 127.0.0.1
+Human-readable Port: 11002
+
+3
+Human-readable IP: 127.0.0.1
+Human-readable Port: 11003
+
+4
+Human-readable IP: 127.0.0.1
+Human-readable Port: 11004
+
+5
+Human-readable IP: 127.0.0.1
+Human-readable Port: 11005
+
+6
+Human-readable IP: 127.0.0.1
+Human-readable Port: 11006
+
+7
+Human-readable IP: 127.0.0.1
+Human-readable Port: 11007
+
+8
+Human-readable IP: 127.0.0.1
+Human-readable Port: 11008
+
+9
+Human-readable IP: 127.0.0.1
+Human-readable Port: 11009
+
+10
+Human-readable IP: 127.0.0.1
+Human-readable Port: 11010
+
+11
+Human-readable IP: 127.0.0.1
+Human-readable Port: 11011
+
+12
+Human-readable IP: 127.0.0.1
+Human-readable Port: 11012
+
+13
+Human-readable IP: 127.0.0.1
+Human-readable Port: 11013
+
+14
+Human-readable IP: 127.0.0.1
+Human-readable Port: 11014
+
+15
+Human-readable IP: 127.0.0.1
+Human-readable Port: 11015
+
+16
+Human-readable IP: 127.0.0.1
+Human-readable Port: 11016
+
+
+Path to output:
+===============
+/home/diogo/Desktop/EPFL/DistributedAlgorithms/DistributedAlgorithms/bin/logs/proc06.output
+
+Path to config:
+===============
+../DistributedAlgorithms/bin/logs/config
+
+Doing some initialization
+
+Current timestamp -> 2021-10-24 21:47:50.314
+
+Broadcasting and delivering messages...
+
+Immediately stopping network packet processing.
+Writing output.
