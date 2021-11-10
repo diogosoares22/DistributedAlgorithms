@@ -28,7 +28,7 @@ public abstract class Channel {
      * @param destPort port of the destination address
      * @return truth value of operation
      */
-    abstract public boolean send(String uuid, String message, InetAddress destIp, int destPort) throws IOException;
+    abstract public boolean send(String messageHeader, String message, int destId, InetAddress destIp, int destPort) throws IOException;
 
     /**
      * @param rawMessage message to be received

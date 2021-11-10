@@ -11,26 +11,40 @@ import java.util.Date;
 
 public class Utils {
 
-    public static String addHeader(String uuid, String message){
-        return uuid + "/" + message;
+    public static String addMessageHeader(String messageHeader, String message){
+        return messageHeader + "/" + message;
     }
 
-    public static String getUUID(String rawMessage){
+    public static String createMessageHeader(String processId, String UUID){
+        return processId + "#" + UUID;
+    }
+
+    public static String createUUID(String sequenceId, String nonce) {
+        return sequenceId + "@" + nonce;
+    }
+
+    public static String getMessageHeader(String rawMessage){
         String[] arr = rawMessage.split("/", 2);
         return arr[0];
     }
 
-    public static String createUUID(String processId, String sequenceId){
-        return processId + "@" + sequenceId;
+    public static String getProcessId(String messageHeader){
+        String[] arr = messageHeader.split("#", 2);
+        return arr[0];
     }
 
-    public static String getProcessId(String UUID){
-        String[] arr = UUID.split("@", 2);
-        return arr[0];
+    public static String getUUID(String messageHeader){
+        String[] arr = messageHeader.split("#", 2);
+        return arr[1];
     }
 
     public static String getSequenceId(String UUID){
         String[] arr = UUID.split("@", 2);
+        return arr[0];
+    }
+
+    public static String getNonce(String UUID){
+        String[] arr = UUID.split("@", 3);
         return arr[1];
     }
 

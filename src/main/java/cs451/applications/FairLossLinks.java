@@ -11,17 +11,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class FairLossLinks extends Channel{
 
-    ConcurrentLinkedQueue<String> _logs;
-
-    public FairLossLinks(ConcurrentLinkedQueue<String> logs){
+    public FairLossLinks(){
         super();
-        _logs = logs;
     }
 
     @Override
-    public boolean send(String uuid, String rawMessage, InetAddress destIp, int destPort) throws IOException {
+    public boolean send(String messageHeader, String rawMessage, int destId, InetAddress destIp, int destPort) throws IOException {
 
-        String message = Utils.addHeader(uuid, rawMessage);
+        String message = Utils.addMessageHeader(messageHeader, rawMessage);
 
         Utils.sendUdpMessage(message, destIp, destPort);
 

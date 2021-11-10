@@ -1,6 +1,6 @@
-My PID: 1739752
+My PID: 58418
 
-From a new terminal type `kill -SIGINT 1739752` or `kill -SIGTERM 1739752` to stop processing packets
+From a new terminal type `kill -SIGINT 58418` or `kill -SIGTERM 58418` to stop processing packets
 
 My ID: 16
 
@@ -81,7 +81,7 @@ Path to config:
 
 Doing some initialization
 
-Current timestamp -> 2021-10-24 21:47:49.991
+Current timestamp -> 2021-11-01 17:16:37.497
 
 Broadcasting and delivering messages...
 

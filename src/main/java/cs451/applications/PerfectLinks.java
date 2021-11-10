@@ -10,26 +10,30 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class PerfectLinks extends Channel {
 
-    ConcurrentLinkedQueue<String> _logs;
     ConcurrentHashMap<String, String> _messageDB;
+    BestEffortBroadcast _bestEffortBroadcast;
 
-    public PerfectLinks(ConcurrentLinkedQueue<String> logs, ConcurrentHashMap<String, String> messageDB) {
+    public PerfectLinks(ConcurrentHashMap<String, String> messageDB) {
         super();
-        _logs = logs;
         _messageDB = messageDB;
     }
 
+    public void setBestEffortBroadcast(BestEffortBroadcast bestEffortBroadcast){
+        _bestEffortBroadcast = bestEffortBroadcast;
+    }
+
     @Override
-    public boolean send(String uuid, String message, InetAddress destIp, int destPort) throws IOException {
-        _logs.add("b " + message);
-        return _belowChannel.send(uuid, message, destIp, destPort);
+    public boolean send(String messageHeader, String message, int destId, InetAddress destIp, int destPort) throws IOException {
+        return _belowChannel.send(messageHeader, message, destId, destIp, destPort);
     }
 
     @Override
     public boolean deliver(String rawMessage) throws IOException {
-        String uuid = Utils.getUUID(rawMessage);
-        if (_messageDB.putIfAbsent(uuid, rawMessage) == null){
-            _logs.add("d " + Utils.getProcessId(uuid) + " " + Utils.getSequenceId(uuid));
+        String messageHeader = Utils.getMessageHeader(rawMessage);
+        if (_messageDB.putIfAbsent(messageHeader, rawMessage) == null){
+            if (_bestEffortBroadcast != null){
+                return _bestEffortBroadcast.deliver(rawMessage);
+            }
             return true;
         }
         return false;

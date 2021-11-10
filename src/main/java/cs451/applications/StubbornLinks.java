@@ -14,13 +14,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class StubbornLinks extends Channel {
 
-    ConcurrentLinkedQueue<String> _logs;
     Parser _parser;
     List<ConcurrentHashMap<String, String>> _ackDB = new ArrayList<>();
 
-    public StubbornLinks(ConcurrentLinkedQueue<String> logs, Parser parser) {
+    public StubbornLinks(Parser parser) {
         super();
-        _logs = logs;
         _parser = parser;
         int hostNumber = parser.hosts().size();
         for (int i = 0; i < hostNumber + 1; i++){
@@ -29,23 +27,25 @@ public class StubbornLinks extends Channel {
     }
 
     @Override
-    public boolean send(String uuid, String rawMessage, InetAddress destIp, int destPort) throws IOException{
-        int processId = Integer.parseInt(Utils.getProcessId(uuid));
-        while (!_ackDB.get(processId).containsKey(uuid)) {
-            _belowChannel.send(uuid, rawMessage, destIp, destPort);
+    public boolean send(String messageHeader, String rawMessage, int destId, InetAddress destIp, int destPort) throws IOException{
+        String uuid = Utils.getUUID(messageHeader);
+        while (!_ackDB.get(destId).containsKey(uuid)) {
+            _belowChannel.send(messageHeader, rawMessage, destId, destIp, destPort);
         }
         return true;
     }
 
     @Override
     public boolean deliver(String rawMessage) throws IOException {
-        String uuid = Utils.getUUID(rawMessage);
+        String messageHeader = Utils.getMessageHeader(rawMessage);
+        String uuid = Utils.getUUID(messageHeader);
         String message = Utils.getMessage(rawMessage);
-        int processId = Integer.parseInt(Utils.getProcessId(uuid));
+        int processId = Integer.parseInt(Utils.getProcessId(messageHeader));
 
         if (!message.equals(Constants.CONFIRMATION)){
             Host host = _parser.getHostById(processId);
-            String confirmMessage = Utils.addHeader(uuid, Constants.CONFIRMATION);
+            String newMessageHeader = Utils.createMessageHeader(String.valueOf(_parser.myId()), uuid);
+            String confirmMessage = Utils.addMessageHeader(newMessageHeader, Constants.CONFIRMATION);
             Utils.sendUdpMessage(confirmMessage, InetAddress.getByName(host.getIp()), host.getPort());
             if (_aboveChannel != null) {
                 return _aboveChannel.deliver(rawMessage);

@@ -84,11 +84,17 @@ public class Main {
 
         System.out.println("Doing some initialization\n");
 
-        FairLossLinks fairLossLink = new FairLossLinks(ImportantData._logs);
+        FairLossLinks fairLossLink = new FairLossLinks();
 
-        StubbornLinks stubbornLink = new StubbornLinks(ImportantData._logs, parser);
+        StubbornLinks stubbornLink = new StubbornLinks(parser);
 
-        PerfectLinks perfectLink = new PerfectLinks(ImportantData._logs, ImportantData._messageDB);
+        PerfectLinks perfectLink = new PerfectLinks(ImportantData._messageDB);
+
+        BestEffortBroadcast bestEffortBroadcast = new BestEffortBroadcast(parser.hosts(), String.valueOf(parser.myId()));
+
+        UniformReliableBroadcast uniformReliableBroadcast = new UniformReliableBroadcast(parser.hosts().size(), String.valueOf(parser.myId()));
+
+        FIFOBroadcast fifoBroadcast = new FIFOBroadcast(parser.hosts().size(), ImportantData._logs);
 
         fairLossLink.setAboveChannel(stubbornLink);
 
@@ -98,15 +104,23 @@ public class Main {
 
         perfectLink.setBelowChannel(stubbornLink);
 
-        ExecutorService executor_receiver = Executors.newFixedThreadPool(15);
+        perfectLink.setBestEffortBroadcast(bestEffortBroadcast);
+
+        bestEffortBroadcast.setPerfectLinks(perfectLink);
+
+        bestEffortBroadcast.setAboveBroadcastAbstraction(uniformReliableBroadcast);
+
+        uniformReliableBroadcast.setBelowBroadcastAbstraction(bestEffortBroadcast);
+
+        uniformReliableBroadcast.setAboveBroadcastAbstraction(fifoBroadcast);
+
+        fifoBroadcast.setBelowBroadcastAbstraction(uniformReliableBroadcast);
+
+        ExecutorService executor_receiver = Executors.newFixedThreadPool(10);
 
         MessageReceiver receiver = new MessageReceiver(parser.myPort(), fairLossLink, executor_receiver);
 
         int noMessages = parser.getMessageNumber();
-
-        int destinationId = parser.getDestination();
-
-        Host destination = parser.getHostById(destinationId);
 
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
@@ -116,14 +130,11 @@ public class Main {
 
         receiver.start();
 
-        if (parser.myId() != destinationId) {
-            ExecutorService executor = Executors.newFixedThreadPool(15);
-            for (int i = 1; i < noMessages + 1; i++) {
-                String uuid = Utils.createUUID(Integer.toString(parser.myId()), String.valueOf(i));
-                MessageSender obj = new MessageSender(perfectLink, uuid, String.valueOf(i) , InetAddress.getByName(destination.getIp()), destination.getPort());
-                executor.execute(obj);
-            }
+        for (int i = 1; i < noMessages + 1; i++) {
+            String uuid = Utils.createUUID(String.valueOf(i), Integer.toString(parser.myId()));
+            fifoBroadcast.broadcast(uuid, Integer.toString(i));
         }
+
 
         // After a process finishes broadcasting,
         // it waits forever for the delivery of messages.
