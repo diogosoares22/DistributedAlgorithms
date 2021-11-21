@@ -29,8 +29,16 @@ public class StubbornLinks extends Channel {
     @Override
     public boolean send(String messageHeader, String rawMessage, int destId, InetAddress destIp, int destPort) throws IOException{
         String uuid = Utils.getUUID(messageHeader);
+        int count = 8;
         while (!_ackDB.get(destId).containsKey(uuid)) {
+            int waitingTime = Math.min(count, 10000); // max waiting time 10 seconds
             _belowChannel.send(messageHeader, rawMessage, destId, destIp, destPort);
+            try {
+                Thread.sleep(waitingTime);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            count = count * 2;
         }
         return true;
     }

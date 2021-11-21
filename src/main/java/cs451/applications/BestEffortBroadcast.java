@@ -25,12 +25,13 @@ public class BestEffortBroadcast extends BroadcastAbstraction{
 
     @Override
     public boolean broadcast(String uuid, String message) throws IOException {
-        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        ExecutorService executorService = Executors.newFixedThreadPool(5);
         for (Host host : _destinationHosts){
             String messageHeader = Utils.createMessageHeader(_processId, uuid);
             MessageSender obj = new MessageSender(_perfectLinksChannel, messageHeader, message, host.getId(), InetAddress.getByName(host.getIp()), host.getPort());
             executorService.execute(obj);
         }
+        executorService.shutdown();
         return true;
     }
 

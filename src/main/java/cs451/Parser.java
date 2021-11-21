@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
@@ -78,6 +79,8 @@ public class Parser {
     public String config() {
         return configParser.getPath();
     }
+
+    public List<Integer> getDependencies(int id) { return configParser.getDependencies(id);}
 
     public int getMessageNumber() {
         File configFile = new File(config());

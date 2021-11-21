@@ -7,7 +7,9 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Utils {
 
@@ -21,6 +23,14 @@ public class Utils {
 
     public static String createUUID(String sequenceId, String nonce) {
         return sequenceId + "@" + nonce;
+    }
+
+    public static String addVectorClock(String UUID, List<Integer> vectorClock){
+        StringBuilder vectorClockAsString = new StringBuilder();
+        for (int el : vectorClock){
+            vectorClockAsString.append("-").append(String.valueOf(el));
+        }
+        return UUID + "@" + vectorClockAsString.toString().substring(1);
     }
 
     public static String getMessageHeader(String rawMessage){
@@ -39,13 +49,23 @@ public class Utils {
     }
 
     public static String getSequenceId(String UUID){
-        String[] arr = UUID.split("@", 2);
+        String[] arr = UUID.split("@", 3);
         return arr[0];
     }
 
     public static String getNonce(String UUID){
         String[] arr = UUID.split("@", 3);
         return arr[1];
+    }
+
+    public static List<Integer> getVectorClock(String UUID){
+        String [] arr = UUID.split("@", 3);
+        String [] elms = arr[2].split("-");
+        List<Integer> vectorClock = new ArrayList<>();
+        for (String elm : elms){
+            vectorClock.add(Integer.parseInt(elm));
+        }
+        return vectorClock;
     }
 
     public static String getMessage(String rawMessage){

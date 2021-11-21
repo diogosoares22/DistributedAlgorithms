@@ -40,8 +40,9 @@ public class UniformReliableBroadcast extends BroadcastAbstraction{
         if (confirmedProcesses == 1){
             _belowBroadcastAbstraction.broadcast(UUID, message);
         }
-        else if ((confirmedProcesses > _noProcesses / 2) & (_deliveredMessages.putIfAbsent(UUID, message) == null)){
-            if (_aboveBroadcastAbstraction != null) {
+        else if (confirmedProcesses > _noProcesses / 2){
+            boolean value = _deliveredMessages.putIfAbsent(UUID, message) == null;
+            if ((_aboveBroadcastAbstraction != null) & (value)) {
                 return _aboveBroadcastAbstraction.deliver(rawMessage);
             }
             return true;
