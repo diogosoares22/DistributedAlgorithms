@@ -96,7 +96,7 @@ public class Main {
 
         FIFOBroadcast fifoBroadcast = new FIFOBroadcast(parser.hosts().size(), ImportantData._logs);
 
-        LocalizedCausalBroadcast localizedCausalBroadcast = new LocalizedCausalBroadcast(parser.myId(), parser.getDependencies(parser.myId()), parser.hosts().size());
+        LocalizedCausalBroadcast localizedCausalBroadcast = new LocalizedCausalBroadcast(parser.myId(), parser.getDependencies(parser.myId()), parser.hosts().size(), ImportantData._logs);
 
         fairLossLink.setAboveChannel(stubbornLink);
 
@@ -116,15 +116,15 @@ public class Main {
 
         /* Fifo broadcast */
 
-        uniformReliableBroadcast.setAboveBroadcastAbstraction(fifoBroadcast);
+        // uniformReliableBroadcast.setAboveBroadcastAbstraction(fifoBroadcast);
 
-        fifoBroadcast.setBelowBroadcastAbstraction(uniformReliableBroadcast);
+        // fifoBroadcast.setBelowBroadcastAbstraction(uniformReliableBroadcast);
 
         /* Localized reliable broadcast */
 
-        // uniformReliableBroadcast.setAboveBroadcastAbstraction(localizedCausalBroadcast);
+        uniformReliableBroadcast.setAboveBroadcastAbstraction(localizedCausalBroadcast);
 
-        // localizedCausalBroadcast.setBelowBroadcastAbstraction(uniformReliableBroadcast);
+        localizedCausalBroadcast.setBelowBroadcastAbstraction(uniformReliableBroadcast);
 
         ExecutorService executor_receiver = Executors.newFixedThreadPool(5);
 
@@ -145,10 +145,10 @@ public class Main {
             String uuid = Utils.createUUID(String.valueOf(i), Integer.toString(parser.myId()));
 
             /* Fifo broadcast */
-            fifoBroadcast.broadcast(uuid, Integer.toString(i));
+            // fifoBroadcast.broadcast(uuid, Integer.toString(i));
 
             /* Localized reliable broadcast */
-            // localizedCausalBroadcast.broadcast(uuid, Integer.toString(i));
+            localizedCausalBroadcast.broadcast(uuid, Integer.toString(i));
         }
 
 
