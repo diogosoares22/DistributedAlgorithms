@@ -38,6 +38,7 @@ public class LocalizedCausalBroadcast extends BroadcastAbstraction{
             _senderVectorClock.set(_myId, _senderVectorClock.get(_myId) + 1);
             vectorDependencies = getVectorDependencies();
         }
+        
         return _belowBroadcastAbstraction.broadcast(Utils.addVectorClock(uuid, vectorDependencies), message); // need to send current vector clock, with non affectedProcesses with 0s
     }
 
@@ -46,9 +47,6 @@ public class LocalizedCausalBroadcast extends BroadcastAbstraction{
         String messageHeader = Utils.getMessageHeader(rawMessage);
         String UUID = Utils.getUUID(messageHeader);
         List<Integer> messageVectorClock = Utils.getVectorClock(UUID);
-
-        System.out.println("\nReceived Message with VectorClock: ");
-        System.out.println(messageVectorClock);
 
         MessageWithVectorClock messageWithVectorClock = new MessageWithVectorClock(messageVectorClock, rawMessage);
 
@@ -62,28 +60,18 @@ public class LocalizedCausalBroadcast extends BroadcastAbstraction{
     public synchronized void tryDeliverPendingMessages() throws IOException{
         // see if pending messages can be delivered
         boolean iterate = true;
-        while (iterate) {
+        while (iterate && !_pendingMessages.isEmpty()) {
             for (MessageWithVectorClock value : _pendingMessages) {
                 iterate = processMessageVectorClock(value);
                 if (iterate) {
                     String currUUID = Utils.getUUID(value._message);
                     int processId = Integer.parseInt(Utils.getNonce(currUUID));
                     int sequenceId = Integer.parseInt(Utils.getSequenceId(currUUID));
-
-                    if (_aboveBroadcastAbstraction != null) {
-                        _aboveBroadcastAbstraction.deliver(value._message);
-                    }
-
-                    System.out.println("\nDelivered Message with VectorClock: ");
-                    System.out.println(value._vectorClock);
-
                     _logs.add("d " + processId + " " + sequenceId);
-
                     _pendingMessages.remove(value);
                     break;
                 }
             }
-            iterate = false;
         }
     }
 
